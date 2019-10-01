@@ -2,23 +2,25 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
 
-app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
 
 function generateRandomString() {
   let result = "";
   let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for(let i = 0; i < 6; i++) {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
+  };
   return result;
-}
+};
 
 //root
 app.get("/", (req, res) => {
@@ -70,6 +72,14 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //edit a url
 app.post("/urls/:shortURL", (req, res) => {
   urlDatabase[req.params.shortURL] = req.body.longURL;
+  res.redirect("/urls");
+})
+
+//login
+app.post("/login", (req, res) => {
+  let username = req.body.username
+  res.cookie('username', username)
+  console.log(username);
   res.redirect("/urls");
 })
 
