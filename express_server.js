@@ -11,47 +11,6 @@ const urlDatabase = {
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n")
-});
-
-app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars);
-});
-
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
-});
-
-app.get("/urls/:shortURL", (req, res) => {
-  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
-  res.render("urls_show", templateVars);
-});
-
-app.post("/urls", (req, res) => {
-  let string = generateRandomString();
-  urlDatabase[string] = req.body.longURL;
-  res.redirect(`/urls/${string}`);
-});
-
-app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
-})
-
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
-});
-
 function generateRandomString() {
   let result = "";
   let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -61,7 +20,53 @@ function generateRandomString() {
   return result;
 }
 
+//root
+app.get("/", (req, res) => {
+  res.send("Hello!");
+});
+
+//shows JSON data 
+app.get("/urls.json", (req, res) => {
+  res.json(urlDatabase);
+});
+
+//shows all urls
+app.get("/urls", (req, res) => {
+  let templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
+});
+
+//page to create new urls
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+//create page for new url 
+app.get("/urls/:shortURL", (req, res) => {
+  let templateVars = { shortURL: req.params.shortURL, longURL: urlDatabase[req.params.shortURL] };
+  res.render("urls_show", templateVars);
+});
+
+//generate random string
+//add new short url/long url pair to database
+app.post("/urls", (req, res) => {
+  let string = generateRandomString();
+  urlDatabase[string] = req.body.longURL;
+  res.redirect(`/urls/${string}`);
+});
+
+//short url on individual url page links to long url 
+app.get("/u/:shortURL", (req, res) => {
+  const longURL = urlDatabase[req.params.shortURL];
+  res.redirect(longURL);
+})
+
+//delete a url 
 app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
+});
+
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}!`);
 });
