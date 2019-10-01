@@ -85,10 +85,14 @@ app.post("/urls/:shortURL", (req, res) => {
 
 //login
 app.post("/login", (req, res) => {
-  let username = req.body.username
-  res.cookie('username', username)
-  console.log(username);
+  res.cookie('username', req.body.username);
   res.redirect("/urls");
+})
+
+//logout
+app.post("/logout", (req, res) => {
+  res.clearCookie('username', req.body.username);
+  res.redirect("/urls")
 })
 
 app.listen(PORT, () => {
