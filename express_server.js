@@ -39,13 +39,14 @@ app.get("/urls/:shortURL", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);
-  res.send("Ok");
+  let string = generateRandomString();
+  urlDatabase[string] = req.body.longURL;
+  res.redirect(`/urls/${string}`);
 });
 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL)
+  res.redirect(longURL);
 })
 
 app.listen(PORT, () => {
@@ -60,3 +61,8 @@ function generateRandomString() {
   }
   return result;
 }
+
+app.post("/u/:shortURL/delete", (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls");
+});
