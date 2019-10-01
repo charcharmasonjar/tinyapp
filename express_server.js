@@ -62,7 +62,7 @@ function generateRandomString() {
   return result;
 }
 
-app.post("/u/:shortURL/delete", (req, res) => {
+app.post("/urls/:shortURL/delete", (req, res) => {
   delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
