@@ -8,6 +8,7 @@
   <!-- Bootstrap CSS -->
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
     integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <title>TinyApp</title>
 </head>
 
@@ -28,27 +29,37 @@
       </div>
     </nav>
   </header>
-<div class="card text-center">
+  <div class="card text-center">
     <div class="card-header"></div>
     <div class="card-body">
-    <h3>Register for TinyApp</h3>
-    <p>It's gonna be so fun!</p>
-  <form method="POST" action="/register">
-    <div class="form-group">
-      <label>
-        Email address
-        <input type="email" name="email" class="form-control" placeholder="email">
-      </label>
+      <h3>Register for TinyApp</h3>
+      <p>It's gonna be so fun!</p>
+      <form method="POST" action="/register">
+        <div class="form-group">
+          <label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">
+                  <i class="fa fa-envelope" aria-hidden="true"></i></span>
+              </div>
+              <input type="email" name="email" class="form-control" placeholder="Email Address">
+            </div>
+          </label>
+        </div>
+        <div class="form-group">
+            <label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text" id="basic-addon1">
+                  <i class="fa fa-lock" aria-hidden="true"></i></span>
+                </div>
+                <input type="password" name="password" class="form-control" placeholder="Password">
+            </div>
+          </label>
+        </div>
+        <button type="submit" class="btn btn-outline-success">Submit</button>
+      </form>
     </div>
-    <div class="form-group">
-      <label>
-        Password
-        <input type="password" name="password" class="form-control" placeholder="password">
-      </label>
-    </div>
-    <button type="submit" class="btn btn-outline-success">Submit</button>
-    </form>
-  </div>
     <div class="card-footer"></div>
   </div>
 
