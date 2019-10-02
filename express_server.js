@@ -70,6 +70,9 @@ app.get("/", (req, res) => {
 
 //shows all urls
 app.get("/urls", (req, res) => {
+  if (!req.cookies["user_id"]) {
+    res.redirect("/login");
+  }
   let templateVars = {
     urls: urlsForUser(req.cookies["user_id"]),
     user: users[req.cookies["user_id"]],
@@ -91,9 +94,15 @@ app.get("/urls/new", (req, res) => {
 
 //create page for new url 
 app.get("/urls/:shortURL", (req, res) => {
+  if (!req.cookies["user_id"]) {
+    res.redirect("/login");
+  }
+  if (urlDatabase[req.params.shortURL].userID !== req.cookies["user_id"]) {
+    return res.status(403).send("you can't view someone else's urls boo");
+  }
   let templateVars = {
     shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL],
+    longURL: urlDatabase[req.params.shortURL].longURL,
     user: users[req.cookies["user_id"]],
   };
   res.render("urls_show", templateVars);
@@ -179,7 +188,7 @@ app.post("/register", (req, res) => {
 
 //logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id', req.body.id);
+  res.clearCookie('user_id');
   res.redirect("/urls")
 })
 
