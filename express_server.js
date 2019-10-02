@@ -61,7 +61,11 @@ app.get("/urls", (req, res) => {
 });
 
 //page to create new urls
+//if not logged in, redirect to login page
 app.get("/urls/new", (req, res) => {
+  if (!req.cookies["user_id"]) {
+    res.redirect("/login");
+  }
   let templateVars = {
     user: users[req.cookies["user_id"]]
   }
@@ -96,6 +100,12 @@ app.post("/urls/:shortURL", (req, res) => {
   urlDatabase[req.params.shortURL] = req.body.longURL;
   res.redirect("/urls");
 })
+
+//delete a url 
+app.post("/urls/:shortURL/delete", (req, res) => {
+  delete urlDatabase[req.params.shortURL];
+  res.redirect("/urls");
+});
 
 //login page
 app.get("/login", (req, res) => {
@@ -145,12 +155,6 @@ app.post("/register", (req, res) => {
     password: req.body.password
   }
   res.cookie('user_id', userID);
-  res.redirect("/urls");
-});
-
-//delete a url 
-app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
 
