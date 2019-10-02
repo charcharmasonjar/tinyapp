@@ -68,17 +68,17 @@ app.get("/urls", (req, res) => {
 
 //page to create new urls
 app.get("/urls/new", (req, res) => {
-  let templateVars = { username: req.cookies["username"] }
+  let templateVars = { 
+    user: users[req.cookies["user_id"]] }
   res.render("urls_new", templateVars);
 });
 
 //create page for new url 
 app.get("/urls/:shortURL", (req, res) => {
-  const userID = req.cookies["user_id"];
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    email: users[userID]["email"],
+    user: users[req.cookies["user_id"]],
   };
   res.render("urls_show", templateVars);
 });
