@@ -36,6 +36,16 @@ function generateRandomString() {
   return result;
 };
 
+//checks if email already exists in user object
+const checkEmailTaken = function (email, object) {
+  for (let id in object) {
+    if (object[id].email === email) {
+      return true;
+    }
+  }
+  return false;
+}
+
 //root
 app.get("/", (req, res) => {
   res.send("Hello!");
