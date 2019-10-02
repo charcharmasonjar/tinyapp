@@ -115,6 +115,9 @@ app.get("/register", (req, res) => {
 
 //create user 
 app.post("/register", (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).send("Please fill out both email and password");
+  }
   let userID = generateRandomString();
   users[userID] = {
     id: userID,
