@@ -36,7 +36,7 @@ function generateRandomString() {
   return result;
 };
 
-//checks if email already exists in user object
+//checks if email already exists in a given object
 const checkEmailTaken = function (email, object) {
   for (let id in object) {
     if (object[id].email === email) {
@@ -131,11 +131,10 @@ app.post("/login", (req, res) => {
   if (!checkEmailTaken(req.body.email, users)) {
     return res.status(403).send("Incorrect email address")
   }
-  let userObject = checkEmailTaken(req.body.email, users);
-  let userID = userObject.id;
-  if (userObject.password !== req.body.password) {
+  let userID = checkEmailTaken(req.body.email, users)["id"];
+  if (users[userID].password !== req.body.password) {
     return res.status(403).send("Incorrect password");
-  } 
+  }
   res.cookie('user_id', userID);
   res.redirect("/urls");
 });
