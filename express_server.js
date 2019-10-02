@@ -58,9 +58,10 @@ app.get("/urls.json", (req, res) => {
 
 //shows all urls
 app.get("/urls", (req, res) => {
+  const userID = req.cookies["user_id"];
   let templateVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    email: users[userID]["email"],
   };
   res.render("urls_index", templateVars);
 });
@@ -73,10 +74,11 @@ app.get("/urls/new", (req, res) => {
 
 //create page for new url 
 app.get("/urls/:shortURL", (req, res) => {
+  const userID = req.cookies["user_id"];
   let templateVars = {
     shortURL: req.params.shortURL,
     longURL: urlDatabase[req.params.shortURL],
-    username: req.cookies["username"],
+    email: users[userID]["email"],
   };
   res.render("urls_show", templateVars);
 });
