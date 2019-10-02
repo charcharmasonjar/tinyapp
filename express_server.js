@@ -51,11 +51,6 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
-//shows JSON data 
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
 //shows all urls
 app.get("/urls", (req, res) => {
   let templateVars = {
@@ -83,23 +78,17 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-//generate random string and add new short url/long url pair to database
-app.post("/urls", (req, res) => {
-  let string = generateRandomString();
-  urlDatabase[string] = req.body.longURL;
-  res.redirect(`/urls/${string}`);
-});
-
 //short url on individual url page links to long url 
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 })
 
-//delete a url 
-app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
-  res.redirect("/urls");
+//generate random string and add new short url/long url pair to database
+app.post("/urls", (req, res) => {
+  let string = generateRandomString();
+  urlDatabase[string] = req.body.longURL;
+  res.redirect(`/urls/${string}`);
 });
 
 //edit a url
@@ -108,11 +97,12 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/urls");
 })
 
-
-//logout
-app.post("/logout", (req, res) => {
-  res.clearCookie('user_id', req.body.id);
-  res.redirect("/urls")
+//login page
+app.get("/login", (req, res) => {
+  let templateVars = {
+    user: users[req.cookies["user_id"]]
+  }
+  res.render("login", templateVars);
 })
 
 //registration page
@@ -122,6 +112,23 @@ app.get("/register", (req, res) => {
   }
   res.render("register", templateVars);
 })
+
+//check if login info is correct
+app.post("/login", (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).send("Please fill out both email and password");
+  }
+  if (!checkEmailTaken(req.body.email, users)) {
+    return res.status(403).send("Incorrect email address")
+  }
+  let userObject = checkEmailTaken(req.body.email, users);
+  let userID = userObject.id;
+  if (userObject.password !== req.body.password) {
+    return res.status(403).send("Incorrect password");
+  } 
+  res.cookie('user_id', userID);
+  res.redirect("/urls");
+});
 
 //create user 
 app.post("/register", (req, res) => {
@@ -141,30 +148,17 @@ app.post("/register", (req, res) => {
   res.redirect("/urls");
 });
 
-//login page
-app.get("/login", (req, res) => {
-  let templateVars = {
-    user: users[req.cookies["user_id"]]
-  }
-  res.render("login", templateVars);
-})
-
-//check if login info is correct
-app.post("/login", (req, res) => {
-  if (!req.body.email || !req.body.password) {
-    return res.status(400).send("Please fill out both email and password");
-  }
-  if (!checkEmailTaken(req.body.email, users)) {
-    return res.status(403).send("Incorrect email address")
-  }
-  let userObject = checkEmailTaken(req.body.email, users);
-  let userID = userObject.id;
-  if (userObject.password !== req.body.password) {
-    return res.status(403).send("Incorrect password");
-  } 
-  res.cookie('user_id', userID);
+//delete a url 
+app.post("/urls/:shortURL/delete", (req, res) => {
+  delete urlDatabase[req.params.shortURL];
   res.redirect("/urls");
 });
+
+//logout
+app.post("/logout", (req, res) => {
+  res.clearCookie('user_id', req.body.id);
+  res.redirect("/urls")
+})
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
