@@ -117,7 +117,10 @@ app.post("/logout", (req, res) => {
 
 //registration page
 app.get("/register", (req, res) => {
-  res.render("register");
+  let templateVars = {
+    user: users[req.cookies["user_id"]]
+  }
+  res.render("register", templateVars);
 })
 
 //create user 
@@ -140,7 +143,10 @@ app.post("/register", (req, res) => {
 
 //login page
 app.get("/login", (req, res) => {
-  res.render("login");
+  let templateVars = {
+    user: users[req.cookies["user_id"]]
+  }
+  res.render("login", templateVars);
 })
 
 //check if login info is correct
