@@ -40,7 +40,7 @@ function generateRandomString() {
 const checkEmailTaken = function (email, object) {
   for (let id in object) {
     if (object[id].email === email) {
-      return true;
+      return object[id];
     }
   }
   return false;
@@ -58,18 +58,18 @@ app.get("/urls.json", (req, res) => {
 
 //shows all urls
 app.get("/urls", (req, res) => {
-  const userID = req.cookies["user_id"];
   let templateVars = {
     urls: urlDatabase,
-    email: users[userID]["email"],
+    user: users[req.cookies["user_id"]],
   };
   res.render("urls_index", templateVars);
 });
 
 //page to create new urls
 app.get("/urls/new", (req, res) => {
-  let templateVars = { 
-    user: users[req.cookies["user_id"]] }
+  let templateVars = {
+    user: users[req.cookies["user_id"]]
+  }
   res.render("urls_new", templateVars);
 });
 
@@ -108,15 +108,10 @@ app.post("/urls/:shortURL", (req, res) => {
   res.redirect("/urls");
 })
 
-//login
-app.post("/login", (req, res) => {
-  res.cookie('username', req.body.username);
-  res.redirect("/urls");
-})
 
 //logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('username', req.body.username);
+  res.clearCookie('user_id', req.body.id);
   res.redirect("/urls")
 })
 
@@ -147,6 +142,23 @@ app.post("/register", (req, res) => {
 app.get("/login", (req, res) => {
   res.render("login");
 })
+
+//check if login info is correct
+app.post("/login", (req, res) => {
+  if (!req.body.email || !req.body.password) {
+    return res.status(400).send("Please fill out both email and password");
+  }
+  if (!checkEmailTaken(req.body.email, users)) {
+    return res.status(403).send("Incorrect email address")
+  }
+  let userObject = checkEmailTaken(req.body.email, users);
+  let userID = userObject.id;
+  if (userObject.password !== req.body.password) {
+    return res.status(403).send("Incorrect password");
+  } 
+  res.cookie('user_id', userID);
+  res.redirect("/urls");
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
