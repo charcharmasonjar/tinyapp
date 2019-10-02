@@ -128,6 +128,9 @@ app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).send("Please fill out both email and password");
   }
+  if (checkEmailTaken(req.body.email, users)) {
+    return res.status(400).send("Email address is already taken");
+  }
   let userID = generateRandomString();
   users[userID] = {
     id: userID,
@@ -135,7 +138,6 @@ app.post("/register", (req, res) => {
     password: req.body.password
   }
   res.cookie('user_id', userID);
-  console.log(users);
   res.redirect("/urls");
 });
 
