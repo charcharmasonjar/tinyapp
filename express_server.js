@@ -8,6 +8,7 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
 const users = {
   "userRandomID": {
     id: "userRandomID",
@@ -19,12 +20,13 @@ const users = {
     email: "user2@example.com",
     password: "dishwasher-funk"
   }
-}
+};
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+//generates string of six random characters
 function generateRandomString() {
   let result = "";
   let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -69,8 +71,7 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-//generate random string
-//add new short url/long url pair to database
+//generate random string and add new short url/long url pair to database
 app.post("/urls", (req, res) => {
   let string = generateRandomString();
   urlDatabase[string] = req.body.longURL;
@@ -107,9 +108,23 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls")
 })
 
+//registration page
 app.get("/register", (req, res) => {
   res.render("register");
 })
+
+//create user 
+app.post("/register", (req, res) => {
+  let userID = generateRandomString();
+  users[userID] = {
+    id: userID,
+    email: req.body.email,
+    password: req.body.password
+  }
+  res.cookie('user_id', userID);
+  console.log(users);
+  res.redirect("/urls");
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
