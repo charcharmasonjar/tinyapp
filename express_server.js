@@ -4,7 +4,7 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const brcypt = require('bcrypt');
 const cookieSession = require('cookie-session');
-const getUserByEmail = require('./helpers.js');
+const { getUserByEmail } = require('./helpers.js');
 
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
