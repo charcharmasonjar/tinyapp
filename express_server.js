@@ -4,7 +4,7 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const brcypt = require('bcrypt');
 const cookieSession = require('cookie-session');
-const { getUserByEmail } = require('./helpers.js');
+const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers.js');
 
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
@@ -32,27 +32,6 @@ app.use(cookieSession({
   keys: ['YEET']
 }));
 
-//generates string of six random characters
-const generateRandomString = function() {
-  let result = "";
-  let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < 6; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
-};
-
-//returns an object of urls belonging to the logged in user
-const urlsForUser = function(id) {
-  let result = {};
-  for (let shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      result[shortURL] = urlDatabase[shortURL].longURL;
-    }
-  }
-  return result;
-};
-
 //root
 app.get("/", (req, res) => {
   if (!req.session.user_id) {
@@ -67,7 +46,7 @@ app.get("/urls", (req, res) => {
     return res.redirect("/login");
   }
   let templateVars = {
-    urls: urlsForUser(req.session.user_id),
+    urls: urlsForUser(req.session.user_id, urlDatabase),
     user: users[req.session.user_id],
   };
   res.render("urls_index", templateVars);
