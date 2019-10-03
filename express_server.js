@@ -33,17 +33,17 @@ app.use(cookieSession({
 }));
 
 //generates string of six random characters
-function generateRandomString() {
+const generateRandomString = function() {
   let result = "";
   let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for (let i = 0; i < 6; i++) {
     result += characters.charAt(Math.floor(Math.random() * characters.length));
-  };
+  }
   return result;
 };
 
 //returns an object of urls belonging to the logged in user
-const urlsForUser = function (id) {
+const urlsForUser = function(id) {
   let result = {};
   for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
@@ -51,7 +51,7 @@ const urlsForUser = function (id) {
     }
   }
   return result;
-}
+};
 
 //root
 app.get("/", (req, res) => {
@@ -81,11 +81,11 @@ app.get("/urls/new", (req, res) => {
   }
   let templateVars = {
     user: users[req.session.user_id]
-  }
+  };
   res.render("urls_new", templateVars);
 });
 
-//create page for new url 
+//create page for new url
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const id = req.session.user_id;
@@ -106,11 +106,11 @@ app.get("/urls/:shortURL", (req, res) => {
   res.render("urls_show", templateVars);
 });
 
-//short url on individual url page links to long url 
+//short url on individual url page links to long url
 app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
-})
+});
 
 //generate random string and add new short url/long url pair to database
 app.post("/urls", (req, res) => {
@@ -118,7 +118,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[string] = {
     longURL: req.body.longURL,
     userID: req.session.user_id,
-  }
+  };
   res.redirect(`/urls/${string}`);
 });
 
@@ -137,9 +137,9 @@ app.post("/urls/:shortURL", (req, res) => {
   }
   urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
-})
+});
 
-//delete a url 
+//delete a url
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   const id = req.session.user_id;
@@ -160,18 +160,18 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.get("/login", (req, res) => {
   let templateVars = {
     user: users[req.session.user_id]
-  }
+  };
   res.render("login", templateVars);
-})
+});
 
 //registration page
 app.get("/register", (req, res) => {
   //what is the point of this?
   let templateVars = {
     user: users[req.session.user_id]
-  }
+  };
   res.render("register", templateVars);
-})
+});
 
 //check if login info is correct
 app.post("/login", (req, res) => {
@@ -179,7 +179,7 @@ app.post("/login", (req, res) => {
     return res.status(400).send("Please fill out both email and password");
   }
   if (!getUserByEmail(req.body.email, users)) {
-    return res.status(403).send("Incorrect email address")
+    return res.status(403).send("Incorrect email address");
   }
   let userID = getUserByEmail(req.body.email, users)["id"];
   if (!brcypt.compareSync(req.body.password, users[userID].password)) {
@@ -189,7 +189,7 @@ app.post("/login", (req, res) => {
   res.redirect("/urls");
 });
 
-//create user 
+//create user
 app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).send("Please fill out both email and password");
@@ -198,23 +198,23 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Email address is already taken");
   }
   const userID = generateRandomString();
-  const password = req.body.password
+  const password = req.body.password;
   const hashedPassword = brcypt.hashSync(password, 10);
   users[userID] = {
     id: userID,
     email: req.body.email,
     password: hashedPassword,
-  }
+  };
   req.session.user_id = userID;
   res.redirect("/urls");
 });
 
 //logout
 app.post("/logout", (req, res) => {
-  //idk if this is right 
+  //idk if this is right
   req.session = null;
-  res.redirect("/urls")
-})
+  res.redirect("/urls");
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
