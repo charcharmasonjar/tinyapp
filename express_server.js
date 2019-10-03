@@ -32,7 +32,6 @@ app.use(cookieSession({
   keys: ['YEET']
 }));
 
-//root
 app.get("/", (req, res) => {
   if (!req.session.user_id) {
     return res.redirect("/login");
@@ -67,7 +66,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const id = req.session.user_id;
   if (!id) {
-    return res.redirect("/login");
+    return res.status(403).send("Please login or register");
   }
   if (!urlDatabase[shortURL]) {
     return res.status(404).send("tiny url does not exist");
@@ -132,7 +131,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
     return res.status(404).send("tiny url does not exist");
   }
   if (urlDatabase[shortURL].userID !== id) {
-    return res.status(403).send("you can't view someone else's urls boo");
+    return res.status(403).send("you can't delete someone else's urls boo");
   }
   delete urlDatabase[shortURL];
   res.redirect("/urls");
