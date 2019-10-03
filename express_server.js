@@ -71,7 +71,7 @@ app.get("/", (req, res) => {
 //shows all urls
 app.get("/urls", (req, res) => {
   if (!req.cookies["user_id"]) {
-    res.redirect("/login");
+    return res.redirect("/login");
   }
   let templateVars = {
     urls: urlsForUser(req.cookies["user_id"]),
@@ -84,7 +84,7 @@ app.get("/urls", (req, res) => {
 //if not logged in, redirect to login page
 app.get("/urls/new", (req, res) => {
   if (!req.cookies["user_id"]) {
-    res.redirect("/login");
+    return res.redirect("/login");
   }
   let templateVars = {
     user: users[req.cookies["user_id"]]
@@ -94,23 +94,28 @@ app.get("/urls/new", (req, res) => {
 
 //create page for new url 
 app.get("/urls/:shortURL", (req, res) => {
-  if (!req.cookies["user_id"]) {
-    res.redirect("/login");
+  const shortURL = req.params.shortURL;
+  const id = req.cookies["user_id"];
+  if (!id) {
+    return res.redirect("/login");
+  } 
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send("tiny url does not exist");
   }
-  if (urlDatabase[req.params.shortURL].userID !== req.cookies["user_id"]) {
+  if (urlDatabase[shortURL].userID !== id) {
     return res.status(403).send("you can't view someone else's urls boo");
   }
   let templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[req.params.shortURL].longURL,
-    user: users[req.cookies["user_id"]],
+    shortURL: shortURL,
+    longURL: urlDatabase[shortURL].longURL,
+    user: users[id],
   };
   res.render("urls_show", templateVars);
 });
 
 //short url on individual url page links to long url 
 app.get("/u/:shortURL", (req, res) => {
-  const longURL = urlDatabase[req.params.shortURL];
+  const longURL = urlDatabase[req.params.shortURL].longURL;
   res.redirect(longURL);
 })
 
