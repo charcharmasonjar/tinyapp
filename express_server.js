@@ -45,6 +45,7 @@ app.get("/urls", (req, res) => {
   let templateVars = {
     urls: urlsForUser(req.session.user_id, urlDatabase),
     user: users[req.session.user_id],
+    urlDatabase: urlDatabase,
   };
   res.render("urls_index", templateVars);
 });
@@ -100,7 +101,6 @@ app.post("/urls", (req, res) => {
     userID: req.session.user_id,
     dateCreated: new Date()
   };
-  console.log(urlDatabase);
   res.redirect(`/urls/${string}`);
 });
 
@@ -203,5 +203,5 @@ app.post("/logout", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}!`);
+  console.log(`Tiny app listening on port ${PORT}!`);
 });
