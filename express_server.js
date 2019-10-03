@@ -3,6 +3,7 @@ const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
+const brcypt = require('bcrypt');
 
 // const urlDatabase = {
 //   "b2xVn2": "http://www.lighthouselabs.ca",
