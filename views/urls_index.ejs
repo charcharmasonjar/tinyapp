@@ -12,9 +12,7 @@
 </head>
 
 <body>
-  <header>
     <% include ./partials/_header %>
-  </header>
   <% if (user) { %>
   <main style="margin: 1em;">
     <h4>My URLs</h4>
@@ -46,7 +44,7 @@
             </form>
           </td>
           <td>
-              <%= urlDatabase[url].dateCreated.toDateString() %>
+            <%= urlDatabase[url].dateCreated.toDateString() %>
           </td>
         </tr>
         <% } %>
@@ -55,9 +53,9 @@
     <a href="/urls/new">Create a new tiny URL</a>
   </main>
   <% } else { %>
-    <p style="text-align:center">
-      Please login or register.
-    </p>
+  <p style="text-align:center">
+    Please login or register.
+  </p>
   <% } %>
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
