@@ -148,7 +148,9 @@ app.get("/login", (req, res) => {
 
 //registration page
 app.get("/register", (req, res) => {
-  //what is the point of this?
+  if (req.session.user_id) {
+    return res.redirect("/urls");
+  }
   let templateVars = {
     user: users[req.session.user_id]
   };
