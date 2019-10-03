@@ -4,6 +4,7 @@ const PORT = 8080;
 const bodyParser = require("body-parser");
 const brcypt = require('bcrypt');
 const cookieSession = require('cookie-session');
+const getUserByEmail = require('./helpers.js');
 
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
@@ -40,17 +41,6 @@ function generateRandomString() {
   };
   return result;
 };
-
-//checks if email already exists in a given object
-//if email exists, returns the user object that contains the email
-const getUserByEmail = function (email, database) {
-  for (let id in database) {
-    if (database[id].email === email) {
-      return database[id];
-    }
-  }
-  return false;
-}
 
 //returns an object of urls belonging to the logged in user
 const urlsForUser = function (id) {
