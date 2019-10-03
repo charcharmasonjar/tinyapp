@@ -42,10 +42,11 @@ function generateRandomString() {
 };
 
 //checks if email already exists in a given object
-const checkEmailTaken = function (email, users) {
-  for (let id in users) {
-    if (users[id].email === email) {
-      return users[id];
+//if email exists, returns the user object that contains the email
+const getUserByEmail = function (email, database) {
+  for (let id in database) {
+    if (database[id].email === email) {
+      return database[id];
     }
   }
   return false;
@@ -187,10 +188,10 @@ app.post("/login", (req, res) => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).send("Please fill out both email and password");
   }
-  if (!checkEmailTaken(req.body.email, users)) {
+  if (!getUserByEmail(req.body.email, users)) {
     return res.status(403).send("Incorrect email address")
   }
-  let userID = checkEmailTaken(req.body.email, users)["id"];
+  let userID = getUserByEmail(req.body.email, users)["id"];
   if (!brcypt.compareSync(req.body.password, users[userID].password)) {
     return res.status(403).send("Incorrect password");
   }
@@ -203,7 +204,7 @@ app.post("/register", (req, res) => {
   if (!req.body.email || !req.body.password) {
     return res.status(400).send("Please fill out both email and password");
   }
-  if (checkEmailTaken(req.body.email, users)) {
+  if (getUserByEmail(req.body.email, users)) {
     return res.status(400).send("Email address is already taken");
   }
   const userID = generateRandomString();
