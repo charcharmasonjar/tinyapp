@@ -2,13 +2,8 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
 const brcypt = require('bcrypt');
-
-// const urlDatabase = {
-//   "b2xVn2": "http://www.lighthouselabs.ca",
-//   "9sm5xK": "http://www.google.com"
-// };
+const cookieSession = require('cookie-session');
 
 const urlDatabase = {
   b6UTxQ: { longURL: "https://www.tsn.ca", userID: "userRandomID" },
@@ -31,7 +26,10 @@ const users = {
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['YEET']
+}));
 
 //generates string of six random characters
 function generateRandomString() {
@@ -44,10 +42,10 @@ function generateRandomString() {
 };
 
 //checks if email already exists in a given object
-const checkEmailTaken = function (email, object) {
-  for (let id in object) {
-    if (object[id].email === email) {
-      return object[id];
+const checkEmailTaken = function (email, users) {
+  for (let id in users) {
+    if (users[id].email === email) {
+      return users[id];
     }
   }
   return false;
@@ -71,12 +69,12 @@ app.get("/", (req, res) => {
 
 //shows all urls
 app.get("/urls", (req, res) => {
-  if (!req.cookies["user_id"]) {
+  if (!req.session.user_id) {
     return res.redirect("/login");
   }
   let templateVars = {
-    urls: urlsForUser(req.cookies["user_id"]),
-    user: users[req.cookies["user_id"]],
+    urls: urlsForUser(req.session.user_id),
+    user: users[req.session.user_id],
   };
   res.render("urls_index", templateVars);
 });
@@ -84,11 +82,11 @@ app.get("/urls", (req, res) => {
 //page to create new urls
 //if not logged in, redirect to login page
 app.get("/urls/new", (req, res) => {
-  if (!req.cookies["user_id"]) {
+  if (!req.session.user_id) {
     return res.redirect("/login");
   }
   let templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   }
   res.render("urls_new", templateVars);
 });
@@ -96,7 +94,7 @@ app.get("/urls/new", (req, res) => {
 //create page for new url 
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const id = req.cookies["user_id"];
+  const id = req.session.user_id;
   if (!id) {
     return res.redirect("/login");
   } 
@@ -125,7 +123,7 @@ app.post("/urls", (req, res) => {
   let string = generateRandomString();
   urlDatabase[string] = {
     longURL: req.body.longURL,
-    userID: req.cookies["user_id"],
+    userID: req.session.user_id,
   }
   res.redirect(`/urls/${string}`);
 });
@@ -133,7 +131,7 @@ app.post("/urls", (req, res) => {
 //edit a url
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const id = req.cookies["user_id"];
+  const id = req.session.user_id;
   if (!id) {
     return res.redirect("/login");
   } 
@@ -150,7 +148,7 @@ app.post("/urls/:shortURL", (req, res) => {
 //delete a url 
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
-  const id = req.cookies["user_id"];
+  const id = req.session.user_id;
   if (!id) {
     return res.redirect("/login");
   } 
@@ -167,7 +165,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 //login page
 app.get("/login", (req, res) => {
   let templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   }
   res.render("login", templateVars);
 })
@@ -176,7 +174,7 @@ app.get("/login", (req, res) => {
 app.get("/register", (req, res) => {
   //what is the point of this?
   let templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   }
   res.render("register", templateVars);
 })
@@ -193,7 +191,7 @@ app.post("/login", (req, res) => {
   if (!brcypt.compareSync(req.body.password, users[userID].password)) {
     return res.status(403).send("Incorrect password");
   }
-  res.cookie('user_id', userID);
+  req.session.user_id = userID;
   res.redirect("/urls");
 });
 
@@ -205,7 +203,7 @@ app.post("/register", (req, res) => {
   if (checkEmailTaken(req.body.email, users)) {
     return res.status(400).send("Email address is already taken");
   }
-  let userID = generateRandomString();
+  const userID = generateRandomString();
   const password = req.body.password
   const hashedPassword = brcypt.hashSync(password, 10);
   users[userID] = {
@@ -213,13 +211,16 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: hashedPassword,
   }
-  res.cookie('user_id', userID);
+  req.session.user_id = userID;
+  console.log(userID);
+  console.log(req.session.user_id);
   res.redirect("/urls");
 });
 
 //logout
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  //idk if this is right 
+  req.session = null;
   res.redirect("/urls")
 })
 
