@@ -78,6 +78,7 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL: shortURL,
     longURL: urlDatabase[shortURL].longURL,
     user: users[id],
+    dateCreated: urlDatabase[shortURL].dateCreated
   };
   res.render("urls_show", templateVars);
 });
@@ -97,7 +98,9 @@ app.post("/urls", (req, res) => {
   urlDatabase[string] = {
     longURL: req.body.longURL,
     userID: req.session.user_id,
+    dateCreated: new Date()
   };
+  console.log(urlDatabase);
   res.redirect(`/urls/${string}`);
 });
 
@@ -112,7 +115,7 @@ app.post("/urls/:shortURL", (req, res) => {
     return res.status(404).send("tiny url does not exist");
   }
   if (urlDatabase[shortURL].userID !== id) {
-    return res.status(403).send("you can't view someone else's urls boo");
+    return res.status(403).send("you can't edit someone else's urls boo");
   }
   urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
@@ -179,7 +182,7 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Please fill out both email and password");
   }
   if (getUserByEmail(req.body.email, users)) {
-    return res.status(400).send("Email address is already taken");
+    return res.status(400).send("Email address already exists");
   }
   const userID = generateRandomString();
   const password = req.body.password;
@@ -195,7 +198,6 @@ app.post("/register", (req, res) => {
 
 //logout
 app.post("/logout", (req, res) => {
-  //idk if this is right
   req.session = null;
   res.redirect("/urls");
 });
