@@ -52,7 +52,7 @@ const checkEmailTaken = function (email, users) {
 }
 
 //returns an object of urls belonging to the logged in user
-const urlsForUser = function(id) {
+const urlsForUser = function (id) {
   let result = {};
   for (let shortURL in urlDatabase) {
     if (urlDatabase[shortURL].userID === id) {
@@ -64,7 +64,10 @@ const urlsForUser = function(id) {
 
 //root
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  if (!req.session.user_id) {
+    return res.redirect("/login");
+  }
+  res.redirect('/urls');
 });
 
 //shows all urls
@@ -97,7 +100,7 @@ app.get("/urls/:shortURL", (req, res) => {
   const id = req.session.user_id;
   if (!id) {
     return res.redirect("/login");
-  } 
+  }
   if (!urlDatabase[shortURL]) {
     return res.status(404).send("tiny url does not exist");
   }
@@ -134,7 +137,7 @@ app.post("/urls/:shortURL", (req, res) => {
   const id = req.session.user_id;
   if (!id) {
     return res.redirect("/login");
-  } 
+  }
   if (!urlDatabase[shortURL]) {
     return res.status(404).send("tiny url does not exist");
   }
@@ -151,7 +154,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   const id = req.session.user_id;
   if (!id) {
     return res.redirect("/login");
-  } 
+  }
   if (!urlDatabase[shortURL]) {
     return res.status(404).send("tiny url does not exist");
   }
@@ -212,8 +215,6 @@ app.post("/register", (req, res) => {
     password: hashedPassword,
   }
   req.session.user_id = userID;
-  console.log(userID);
-  console.log(req.session.user_id);
   res.redirect("/urls");
 });
 
