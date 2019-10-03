@@ -174,6 +174,7 @@ app.get("/login", (req, res) => {
 
 //registration page
 app.get("/register", (req, res) => {
+  //what is the point of this?
   let templateVars = {
     user: users[req.cookies["user_id"]]
   }
@@ -189,7 +190,7 @@ app.post("/login", (req, res) => {
     return res.status(403).send("Incorrect email address")
   }
   let userID = checkEmailTaken(req.body.email, users)["id"];
-  if (users[userID].password !== req.body.password) {
+  if (!brcypt.compareSync(req.body.password, users[userID].password)) {
     return res.status(403).send("Incorrect password");
   }
   res.cookie('user_id', userID);
@@ -205,10 +206,12 @@ app.post("/register", (req, res) => {
     return res.status(400).send("Email address is already taken");
   }
   let userID = generateRandomString();
+  const password = req.body.password
+  const hashedPassword = brcypt.hashSync(password, 10);
   users[userID] = {
     id: userID,
     email: req.body.email,
-    password: req.body.password
+    password: hashedPassword,
   }
   res.cookie('user_id', userID);
   res.redirect("/urls");
