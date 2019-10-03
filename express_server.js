@@ -131,13 +131,35 @@ app.post("/urls", (req, res) => {
 
 //edit a url
 app.post("/urls/:shortURL", (req, res) => {
-  urlDatabase[req.params.shortURL] = req.body.longURL;
+  const shortURL = req.params.shortURL;
+  const id = req.cookies["user_id"];
+  if (!id) {
+    return res.redirect("/login");
+  } 
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send("tiny url does not exist");
+  }
+  if (urlDatabase[shortURL].userID !== id) {
+    return res.status(403).send("you can't view someone else's urls boo");
+  }
+  urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
 })
 
 //delete a url 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  delete urlDatabase[req.params.shortURL];
+  const shortURL = req.params.shortURL;
+  const id = req.cookies["user_id"];
+  if (!id) {
+    return res.redirect("/login");
+  } 
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send("tiny url does not exist");
+  }
+  if (urlDatabase[shortURL].userID !== id) {
+    return res.status(403).send("you can't view someone else's urls boo");
+  }
+  delete urlDatabase[shortURL];
   res.redirect("/urls");
 });
 
