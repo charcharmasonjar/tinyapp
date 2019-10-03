@@ -42,9 +42,6 @@ app.get("/", (req, res) => {
 
 //shows all urls
 app.get("/urls", (req, res) => {
-  if (!req.session.user_id) {
-    return res.redirect("/login");
-  }
   let templateVars = {
     urls: urlsForUser(req.session.user_id, urlDatabase),
     user: users[req.session.user_id],
