@@ -14,16 +14,16 @@
 <body>
     <% include ./partials/_header %>
   <% if (user) { %>
-  <main style="margin: 1em;">
-    <h4>My URLs</h4>
-    <table class="table">
-      <thead>
+  <main style="margin: 1em">
+    <h4 style="text-align:center">My URLs</h4>
+    <table class="table table-striped" >
+      <thead style="background-color:rgb(245, 206, 212)">
         <tr>
-          <th scope="col">Short URL</th>
+          <th scope="col">Tiny URL</th>
           <th scope="col">Long URL</th>
+          <th scope="col">Date Created</th>
           <th scope="col">Edit</th>
           <th scope="col">Delete</th>
-          <th scope="col">Date Created</th>
         </tr>
       </thead>
       <tbody>
@@ -34,23 +34,26 @@
           </td>
           <td><%= urls[url] %></td>
           <td>
+              <%= urlDatabase[url].dateCreated.toDateString() %>
+            </td>
+          <td>
             <form method="GET" action="/urls/<%= url %>/">
-              <button type="submit" class="btn btn-outline-primary">Edit</button>
+              <button type="submit" class="btn btn-outline-primary btn-sm">Edit</button>
             </form>
           </td>
           <td>
             <form method="POST" action="/urls/<%= url %>/delete">
-              <button type="submit" class="btn btn-outline-danger">Delete</button>
+              <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
             </form>
           </td>
-          <td>
-            <%= urlDatabase[url].dateCreated.toDateString() %>
-          </td>
+
         </tr>
         <% } %>
       </tbody>
     </table>
-    <a href="/urls/new">Create a new tiny URL</a>
+    <div style="text-align:center">
+      <a href="/urls/new">Create a new tiny URL</a>
+    </div>
   </main>
   <% } else { %>
   <p style="text-align:center">
