@@ -44,6 +44,7 @@ app.get("/urls", (req, res) => {
   let templateVars = {
     urls: urlsForUser(req.session.user_id, urlDatabase),
     user: users[req.session.user_id],
+    //added this to be able to access date created
     urlDatabase: urlDatabase,
   };
   res.render("urls_index", templateVars);
@@ -137,7 +138,6 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   res.redirect("/urls");
 });
 
-//login page
 app.get("/login", (req, res) => {
   if (req.session.user_id) {
     return res.redirect("/urls");
@@ -148,7 +148,6 @@ app.get("/login", (req, res) => {
   res.render("login", templateVars);
 });
 
-//registration page
 app.get("/register", (req, res) => {
   if (req.session.user_id) {
     return res.redirect("/urls");
